@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "raylib.h": "c",
+        "raymath.h": "c",
+        "stdio.h": "c",
+        "game.h": "c",
+        "tile.h": "c",
+        "cjson.h": "c",
+        "tilemap.h": "c",
+        "__tree": "c",
+        "map": "c"
+    }
+}
