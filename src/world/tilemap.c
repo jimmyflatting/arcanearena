@@ -128,6 +128,7 @@ void add_collision_box(Rectangle box)
     if (numCollisionBoxes < MAX_COLLISION_BOXES)
     {
         collisionBoxes[numCollisionBoxes++] = box;
+        printf("Num collision boxes: %d\n", numCollisionBoxes);
     }
     else
     {
@@ -186,7 +187,8 @@ void draw_layer(tmx_map *map, tmx_layer *layer)
 
                     // Add collision box
                     Rectangle collisionBox = {j * ts->tile_width, i * ts->tile_height, w, h};
-                    add_collision_box(collisionBox); // Function to add collision box
+                    DrawRectangleLinesEx(collisionBox, 2.0f, RED); // shows collision box
+                    add_collision_box(collisionBox);               // Function to add collision box
                 }
                 else
                 {

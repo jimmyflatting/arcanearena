@@ -170,6 +170,13 @@ void GameUpdate()
 
 int check_collision(int x, int y, int width, int height)
 {
+    // TODO: check with actual player box - get stuck in objects
+    // Rectangle playerRect = {
+    //     player.x,
+    //     player.y,
+    //     player.width + 5,
+    //     player.height + 5,
+    // };
     Rectangle playerRect = {x, y, width, height};
     for (int i = 0; i < get_num_collision_boxes(); i++)
     {
@@ -194,24 +201,35 @@ void GridDraw()
     }
 }
 
+void DrawPlayer()
+{
+    // player box
+    DrawRectangle(player.x, player.y, player.width, player.height, player.color);
+    // display player collision box
+    DrawRectangleLines(player.x, player.y, player.width, player.height, BLACK);
+}
+
 void GameDraw()
 {
     // Draw map
     RenderTilemap();
 
-    // Draw player box
-    DrawRectangle(player.x, player.y, player.width, player.height, player.color);
+    // Draw player
+    DrawPlayer(player);
 
-    // Draw grid
-    GridDraw();
+    // Draw enemies
+
+    // Draw health
+
+    // Draw score
+
+    // Draw game over
 
     // Draw bullets
     DrawBullets();
 
-    // Draw enemies (implementation not shown)
-    // Draw score (implementation not shown)
-    // Draw health (implementation not shown)
-    // Draw game over (implementation not shown)
+    // Draw grid
+    // GridDraw();
 }
 
 void UnloadGame()
