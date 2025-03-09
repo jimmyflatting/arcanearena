@@ -1,0 +1,17 @@
+WINDOW_NAME: "Game"
+WINDOW_SETTINGS:
+  MODE: "FULLSCREEN" # FULLSCREEN, WINDOWED, BORDERLESS
+  FPS: 60
+  SIZE:
+    - 1280
+    - 720
+
+CONTROLS:
+  UP: "w"
+  LEFT: "a"
+  DOWN: "s"
+  RIGHT: "d"
+  A: "space"
+  B: "x"
+  PAUSE: "p"
+  QUIT: "q"
