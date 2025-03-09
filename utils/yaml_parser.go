@@ -25,10 +25,11 @@ type T struct {
 		PAUSE string `yaml:"PAUSE"`
 		QUIT  string `yaml:"QUIT"`
 	} `yaml:"CONTROLS"`
+
+	PLAYER_SPEED int32 `yaml:"PLAYER_SPEED"`
 }
 
 func LoadYaml(path string) T {
-	// Load the file content
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +40,6 @@ func LoadYaml(path string) T {
 		log.Fatal(err)
 	}
 
-	// Parse the content
 	t := T{}
 
 	err = yaml.Unmarshal([]byte(b), &t)

@@ -15,3 +15,5 @@ CONTROLS:
   B: "x"
   PAUSE: "p"
   QUIT: "q"
+
+PLAYER_SPEED: 5

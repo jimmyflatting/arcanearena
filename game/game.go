@@ -1,15 +1,19 @@
 package game
 
 import (
+	"app/ecs"
 	"app/utils"
-	"fmt"
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"time"
 )
 
 var window *sdl.Window
+var renderer *sdl.Renderer
 var err error
 var settings utils.T
 var running bool
+
 var windowFlags uint32 = sdl.WINDOW_SHOWN | func() uint32 {
 	switch settings.WINDOW_SETTINGS.MODE {
 	case "WINDOWED":
@@ -21,12 +25,12 @@ var windowFlags uint32 = sdl.WINDOW_SHOWN | func() uint32 {
 	}
 	return 0
 }()
+var imgFlags int = img.INIT_PNG
+var ecsManager *ecs.ECSManager
 
 func Init() {
-	// Initialize settings data
 	settings = utils.LoadYaml("data/settings.yaml")
 
-	// Initialize SDL2
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -35,64 +39,68 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+
+	renderer, err = sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
+	if err != nil {
+		panic(err)
+	}
+
+	// initialize SDL_image
+	if err := img.Init(imgFlags); err != nil {
+		panic(err)
+	}
+
+	// initialize ECS
+	ecsManager = ecs.NewECSManager()
+
+	// create player entity
+	player := ecsManager.CreateEntity()
+	ecsManager.AddPositionComponent(player, 100, 100)
+	ecsManager.AddSpriteComponent(player, "assets/player.png", 32, 32, 10, renderer)
+	ecsManager.AddControlsComponent(player)
+
+	// create some environment entities
+	tree := ecsManager.CreateEntity()
+	ecsManager.AddPositionComponent(tree, 200, 150)
+	ecsManager.AddSpriteComponent(tree, "assets/player.png", 64, 128, 5, renderer)
+
+	// test adding multiple entities
+	for i := 0; i < 10; i++ {
+		rock := ecsManager.CreateEntity()
+		ecsManager.AddPositionComponent(rock, int32(i*50), 300)
+		ecsManager.AddSpriteComponent(rock, "assets/player.png", 32, 32, 5, renderer)
+	}
 }
 
 func Run() {
 	defer sdl.Quit()
 	defer window.Destroy()
 
-	running = true
+	running := true
+	lastTime := time.Now()
+
 	for running {
+		currentTime := time.Now()
+		deltaTime := currentTime.Sub(lastTime).Seconds()
+		lastTime = currentTime
+
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("Quit")
-				running = false
-				break
-			default:
-				handlePlayerInput(&event)
-			}
+			running = ecsManager.HandleInput(event, &settings)
 		}
-		update()
+
+		update(deltaTime, &settings)
 		render()
-		sdl.Delay(16)
+		sdl.Delay(16) // roughly 60 FPS
 	}
 }
 
-func handlePlayerInput(e *sdl.Event) {
-	switch e := (*e).(type) {
-	case *sdl.KeyboardEvent:
-		if e.Type == sdl.KEYDOWN {
-			switch e.Keysym.Sym {
-			case sdl.GetKeyFromName("v"):
-				fmt.Println("V pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.UP):
-				fmt.Println("Up pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.LEFT):
-				fmt.Println("Left pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.DOWN):
-				fmt.Println("Down pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.RIGHT):
-				fmt.Println("Right pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.A):
-				fmt.Println("A pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.B):
-				fmt.Println("B pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.PAUSE):
-				fmt.Println("Pause pressed")
-			case sdl.GetKeyFromName(settings.CONTROLS.QUIT):
-				fmt.Println("Quit pressed")
-				running = false
-				break
-			}
-		}
-	}
-}
-
-func update() {
-	// fmt.Println("Updating game state")
+func update(deltaTime float64, settings *utils.T) {
+	ecsManager.Update(deltaTime, settings)
 }
 
 func render() {
-	// fmt.Println("Rendering game state")
+	renderer.SetDrawColor(0, 0, 0, 255)
+	renderer.Clear()
+	ecsManager.Render(renderer)
+	renderer.Present()
 }
